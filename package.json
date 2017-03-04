@@ -1,0 +1,23 @@
+{
+  "name": "descriptive_object_definition",
+  "version": "0.1.0",
+  "description": "Data transformation from source data to defined object",
+  "main": "main.js",
+  "dependencies": {
+    "json-query": "^2.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a0tea00/dod.git"
+  },
+  "author": "Trey Huang (thuang2@albany.edu)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/a0tea00/dod/issues"
+  },
+  "homepage": "https://github.com/a0tea00/dod#readme"
+}
