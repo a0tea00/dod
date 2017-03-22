@@ -1,40 +1,26 @@
-var kf6_authors = {
-   "_id": {
-      "type":"_id",
-      "target":"",
-      "source":"url/to/authors.json",
-      "path":"$.._id"
-    },
-    "lastName": {
-      "type":"string",
-      "target":"",
-      "source":"url/to/authors.json",
-      "path":"$..lastName"
-    },
-    "firstName":{
-      "type":"string",
-      "target":"",
-      "source":"url/to/authors.json",
-      "path":"$..firstName"
-    } ,
-    "email": {
-      "type":"string",
-      "target":"",
-      "source":"url/to/authors.json",
-      "path":"$..[?(@.email)]"
-    },
-    "type":{
-      "type":"_constant",
-      "target":"string",
-      "source":"string",
-      "path":"Author"
-    } ,
-    "role":{
-      "type":"string",
-      "target":"",
-      "source":"url/to/authors.json",
-      "path":"$..role"
-    }
+ var kf6_authors = {
+   "_def":"/Author",
+   "type":"object",
+   "source":"path/to/Authors.js",
+   "query":"...",
+   "properties":{
+     "_id": {
+        "type":"String",
+        "source":"",
+        "path":"",
+      },
+      "lastName": {
+        "type":"String",
+        "source":"",
+        "path":"",
+      },
+      "firstName":{
+        "type":"String",
+        "source":"",
+        "path":"",
+      }
+   }
+
 };
 
 var kf6_contribution ={
@@ -106,7 +92,7 @@ var kf6_contribution ={
         },
         "source":"url/to/authors.json",
         "path":"$..role"
-           
+
     },
     "modified": {
         "type":"string",
@@ -133,7 +119,7 @@ var kf6_link1 = {
         "created": "2016-09-21T14:11:58.502Z",
         "type": "contains",
         "_from": {
-            "type":"_include",
+            "type":"$ref",
             "target":{
                 "type":"object",
                 "target":"",
@@ -155,5 +141,8 @@ var kf6_link1 = {
             ],
             "modified": "2016-09-21T14:11:58.307Z",
             "permission": "protected"
-}
-
+          }
+        };
+module.exports.kf6_authors = kf6_authors;
+module.exports.kf6_contribution =kf6_contribution;
+module.exports.kf6_link1 = kf6_link1;
