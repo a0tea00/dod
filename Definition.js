@@ -45,40 +45,48 @@ Def.prototype.resolveData = function (id, def) {
         process.exit();
       }
       var q  = def.defTree[id].query?  def.defTree[id].query : "[*]";
+      //1 . query the base data set
+      var ds = this.resolveData(def.defTree[id].source, def)
 
-      var d = this.resolveData(def.defTree[id].source, def)
-      def.defTree[id].data = jq (q, {data:d}).value;//return the query value
+      def.defTree[id].data = jq (q, {data:ds.d}).value;//return the query value
+      def.defTree[id].keyMap = null; //deafult key map to null
 
+      //2. key mapping if key is provided
+      if(def.defTree[id].keys){
+        def.defTree[id].keyMap = {};
+        for (var i = 0; i < def.defTree[id].keys.length; i++) {
+          var keyQuery = "["+def.defTree[id].keys[i]+"]";
+          def.defTree[id].keyMap[def.defTree[id].keys[i]] = jq(keyQuery, {data:d}).value
+
+          //key map wiil fail if the key length is not the data length
+          if (def.defTree[id].keyMap[def.defTree[id].keys[i]].length !=   def.defTree[id].data.length){
+            console.error(id + " cannot use " + id+"."+def.defTree[id].keys[i] +" as key. Data is invalid!");
+            process.exit();
+          }
+        }
+      }
   }
 
-
-    return def.defTree[id].data;
+    return {d:def.defTree[id].data, m:def.defTree[id].keyMap};
 
 };
 
-/*object maping*/
-Def.prototype.transformDef = function (objIn, objOut, prop) {
-  var objOut = {};
-  for (var i = 0; i < prorp.length; i++) {
-    prorp[i]
-  }
-};
-
-
-/*resovle a particular def*/
+/*
+resovle a particular def
+limitiation: dependency will not automatic resolve if one of the def changed
+*/
 Def.prototype.resolveDef = function (id) {
   var propArray = []
   //1. get data
-  var d = this.resolveData(id, this);
+  var ds = this.resolveData(id, this);
+  this.defTree[id].data = ds.d;
+  this.defTree[id].keyMap = ds.m;
 
   //2. apply filters
   if (this.defTree[id].filter && this.defTree[id].filter.length > 0 ){
     for (var i = 0; i < this.defTree[id].filter.length; i++) {
-      this.defTree[id].data = Filter[this.defTree[id].filter[i].name](d, this.defTree[id].filter[i].param);
+      var fds = Filter[this.defTree[id].filter[i].name](this.defTree[id].data , this.defTree[id].keyMap, this.defTree[id].filter[i].param);
     }
-
-  }else{
-    this.defTree[id].data  = d;
   }
 
   //3. transform data
@@ -115,7 +123,19 @@ Def.prototype.resolveDef = function (id) {
           // console.log(Helper[propArray[j].value.helper.name]);
         }
 
-        //4. Advanced - use JSON Query
+        //4. Advanced - use reference
+        else if(propArray[j].value.ref){
+          if (!this.defTree[propArray[j].value.ref]){
+            console.error("Cannot resovle reference " + propArray[j].value.ref + " in " + id +"." + propArray[j].key);
+            process.exit();
+          }
+          if (!this.defTree[propArray[j].value.ref].data || !this.defTree[propArray[j].value.ref].keyMap) {
+            console.error("");
+          }
+          //To DO
+        }
+
+        //5. Advanced - use JSON Query
         else if (propArray[j].value.query){
             objDataTraget[propArray[j].key] = jq(propArray[j].value.query, {data:objDataSource}).value;
 

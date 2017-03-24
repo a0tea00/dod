@@ -1,6 +1,7 @@
 /*data filters*/
 f = {
-  unique:function (data , param) {
+  unique:function (data , keyMap, param) {
+    //TO DO: handle keyMap
     var map = {};
     var data2 = [];
     for (var i = 0; i < data.length; i++) {

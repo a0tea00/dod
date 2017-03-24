@@ -9336,5 +9336,15 @@ var d = {
     "published": true
 };
 
-var r = jq("[authors][guid]", {data:d}).value
+// var r = jq("[viewPostRefs][postInfo][1][body]", {data:d})
+// console.log(r);
+
+var d2= [
+  {key: 3, value:1},
+  {key: 2, value:2},
+  {key: 1, value:4},
+  {key: 4, value:3},
+
+];
+var r = jq("[value]", {data:d2});
 console.log(r);

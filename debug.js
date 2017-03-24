@@ -3,6 +3,7 @@ var fs =require('fs');
 var Def = require('./Definition.js')
 
 
+//kf5 definitions
 var def_viewpost5 ={
   id:"/",
   type:"array",
@@ -109,6 +110,7 @@ var def_author5 = {
   }
 };
 
+//kf 6 definitions
 var def_view6 = {
   id:"/view6",
   type:"object",
@@ -132,6 +134,39 @@ var def_view6 = {
 
 }
 
+var def_body6={
+  id:"/contribution6/body",
+  type:"object",
+  source: "/view5/viewpostrefs5/postInfo5",
+  query:"[body]",
+  keys:["guid"],
+  properties:{
+    body:{source: "body"}
+  }
+}
+
+var def_contribution6 = {
+  id:"/contribution6",
+  source: "/view5/viewpostrefs5/postInfo5",
+  properties:{
+       __v: {value:1},
+       __t: {value:"KContribution"},
+       _id: {source:"guid"},// key must be define before reference
+       group: {value:null},
+       authors: {query:"[authors][guid]"},
+       permission: {value:null},
+       created: {source:"created", helper:{name:"date"}},
+       _groupMembers: {value:[]},
+       type: {source: "postType", helper:{name:"alternativeValue", param:{"NOTE":"Note", "DRAWING":"Drawing"}}},
+       title: {source:"title"},
+       keywords: {value:[]},
+       data: { ref:"/contribution6/body", key:"id", sourceKey:"guid"},
+       modified: {source: "modified",helper:{name:"date"}},
+       text4search: {value:""},
+       status: {value:"active"}
+  }
+
+}
 
 var def_author6 = {
   id:"/author6",
@@ -153,14 +188,29 @@ var def_author6 = {
     }
 };
 
+var def_buildOns6 = {};
 
-var inDef = new Def([def_viewpost5,def_view5,def_post5,def_buildons5,def_author5, def_author6, def_view6]);
+var def_contains6 ={};
 
+var def_links6={};
+
+
+var inDef = new Def([def_viewpost5,def_view5,def_post5,def_buildons5,def_author5, def_author6, def_view6, def_body6, def_contribution6]);
+
+
+/*
+process flow:
+resolve the Definition with the given order.
+(external processing is possible)
+*/
 
 // inDef.resolveDef("/author6");
-inDef.resolveDef("/view6");
+// inDef.resolveDef("/view6");
+inDef.resolveDef("/contribution6");
 
 // console.log(inDef.defTree["/author6"].data);
 //console.log(inDef.defTree["/view6"].data);
+console.log(inDef.defTree["/contribution6"].keyMap);
+
 // jf.writeFileSync("authors6.json", inDef.defTree["/author6"].data )
-jf.writeFileSync("view6.json", inDef.defTree["/view6"].data )
+// jf.writeFileSync("view6.json", inDef.defTree["/view6"].data )
