@@ -56,7 +56,7 @@ Def.prototype.resolveData = function (id, def) {
         def.defTree[id].keyMap = {};
         for (var i = 0; i < def.defTree[id].keys.length; i++) {
           var keyQuery = "["+def.defTree[id].keys[i]+"]";
-          def.defTree[id].keyMap[def.defTree[id].keys[i]] = jq(keyQuery, {data:d}).value
+          def.defTree[id].keyMap[def.defTree[id].keys[i]] = jq(keyQuery, {data:ds.d}).value
 
           //key map wiil fail if the key length is not the data length
           if (def.defTree[id].keyMap[def.defTree[id].keys[i]].length !=   def.defTree[id].data.length){
@@ -124,15 +124,34 @@ Def.prototype.resolveDef = function (id) {
         }
 
         //4. Advanced - use reference
+        // limitiation: compound keys are not yet supported
         else if(propArray[j].value.ref){
           if (!this.defTree[propArray[j].value.ref]){
             console.error("Cannot resovle reference " + propArray[j].value.ref + " in " + id +"." + propArray[j].key);
             process.exit();
           }
           if (!this.defTree[propArray[j].value.ref].data || !this.defTree[propArray[j].value.ref].keyMap) {
-            console.error("");
+            // try to resolve refrence if it has not been resolved
+            this.resolveDef(propArray[j].value.ref);
           }
-          //To DO
+
+          //validate refrence key exists
+          if(!this.defTree[propArray[j].value.ref].keyMap[propArray[j].value.sourceKey]){
+            console.error(propArray[j].value.ref + " is not indexed by " + propArray[j].value.sourceKey + ". Resolve failed.");
+          }
+
+          //validate local key exists
+          if (!objDataTraget[propArray[j].value.key]){
+            console.error(propArray[j].value.key + " is not defined in "+id + ", or it is defined after " + propArray[j].value.key +".");
+            process.exit();
+          }
+
+          //search the keyMap in the reference object for traget index
+          var index = this.defTree[propArray[j].value.ref].keyMap[propArray[j].value.sourceKey].indexOf(objDataTraget[propArray[j].value.key]);
+
+          //get the soruce data by the given index
+          objDataTraget[propArray[j].key] = this.defTree[propArray[j].value.ref].data[index];
+
         }
 
         //5. Advanced - use JSON Query

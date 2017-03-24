@@ -17,8 +17,9 @@ h = {
     if (param[source]){
       return param[source];
     }
-    return source;
-
+    else{
+      return source;
+    }
   },
   yesOrNo:function (source,param){
     /*

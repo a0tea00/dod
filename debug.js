@@ -138,7 +138,6 @@ var def_body6={
   id:"/contribution6/body",
   type:"object",
   source: "/view5/viewpostrefs5/postInfo5",
-  query:"[body]",
   keys:["guid"],
   properties:{
     body:{source: "body"}
@@ -160,7 +159,7 @@ var def_contribution6 = {
        type: {source: "postType", helper:{name:"alternativeValue", param:{"NOTE":"Note", "DRAWING":"Drawing"}}},
        title: {source:"title"},
        keywords: {value:[]},
-       data: { ref:"/contribution6/body", key:"id", sourceKey:"guid"},
+       data: { ref:"/contribution6/body", key:"_id", sourceKey:"guid"},
        modified: {source: "modified",helper:{name:"date"}},
        text4search: {value:""},
        status: {value:"active"}
@@ -210,7 +209,8 @@ inDef.resolveDef("/contribution6");
 
 // console.log(inDef.defTree["/author6"].data);
 //console.log(inDef.defTree["/view6"].data);
-console.log(inDef.defTree["/contribution6"].keyMap);
+// console.log(inDef.defTree["/contribution6"].data);
 
 // jf.writeFileSync("authors6.json", inDef.defTree["/author6"].data )
 // jf.writeFileSync("view6.json", inDef.defTree["/view6"].data )
+jf.writeFileSync("contribution6.json", inDef.defTree["/contribution6"].data )

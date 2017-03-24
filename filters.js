@@ -1,5 +1,11 @@
-/*data filters*/
+/*
+data filters
+TO DO:
+ALl filters should handle keyMap when indexing is enabled.
+
+*/
 f = {
+  //this filter is not currrently working with keyMap
   unique:function (data , keyMap, param) {
     //TO DO: handle keyMap
     var map = {};
