@@ -7,15 +7,29 @@ function Def(defs, callBack){
   this.defTree = {};
   this.error = {};
   for (var i = 0; i < defs.length; i++) {
+      //gather all the ids
       if(defs[i].id){
-        this.defTree[defs[i].id] =defs[i];
+        if (!this.defTree[defs[i].id]){
+          this.defTree[defs[i].id] =defs[i];
+        }
+        else{
+          //Duplicate id error
+          console.error("Duplicate id defined!");
+          console.error(this.defTree[defs[i].id]);
+          console.error(defs[i]);
 
-        //read data files
+        }
+        //read data files if provided
+        //Limitiation: indexing and filters are not applicable for source file def
         if(defs[i].data){
           defs[i].data = jf.readFileSync(defs[i].data);
+            //first time query
+            var q = defs[i].query? defs[i].query : "[*]";
+            defs[i].data = jq(defs[i].query, {data:defs[i].data}).value;
         }
 
       }else{
+        //No id error
         console.error("No id was found...");
         console.error(defs[i]);
         process.exit();
@@ -56,10 +70,13 @@ Def.prototype.resolveData = function (id, def) {
         def.defTree[id].keyMap = {};
         for (var i = 0; i < def.defTree[id].keys.length; i++) {
           var keyQuery = "["+def.defTree[id].keys[i]+"]";
-          def.defTree[id].keyMap[def.defTree[id].keys[i]] = jq(keyQuery, {data:ds.d}).value
+          // keyMap is keyed by the key, and value is the array of the queried values
+          //index order should match the original data
+          def.defTree[id].keyMap[def.defTree[id].keys[i]] = jq(keyQuery, {data:def.defTree[id].data}).value
 
           //key map wiil fail if the key length is not the data length
           if (def.defTree[id].keyMap[def.defTree[id].keys[i]].length !=   def.defTree[id].data.length){
+            console.error(def.defTree[id].keyMap[def.defTree[id].keys[i]].length +"!="+ def.defTree[id].data.length);
             console.error(id + " cannot use " + id+"."+def.defTree[id].keys[i] +" as key. Data is invalid!");
             process.exit();
           }
@@ -67,14 +84,25 @@ Def.prototype.resolveData = function (id, def) {
       }
   }
 
+    //follow this pair convension for dat and keyMap: {d:data, m:keyMap}
     return {d:def.defTree[id].data, m:def.defTree[id].keyMap};
 
 };
 
 /*
+utility to apply filter to value
+*/
+
+Def.prototype.applyHelper = function (input, helper){
+  return r = Helper[helper.name]? Helper[helper.name](input, helper.param) : "Invalid Helper Call!";
+};
+
+/*
 resovle a particular def
 limitiation: dependency will not automatic resolve if one of the def changed
+filters can only be applied to def that is explicitly beging resolved
 */
+
 Def.prototype.resolveDef = function (id) {
   var propArray = []
   //1. get data
@@ -85,7 +113,13 @@ Def.prototype.resolveDef = function (id) {
   //2. apply filters
   if (this.defTree[id].filter && this.defTree[id].filter.length > 0 ){
     for (var i = 0; i < this.defTree[id].filter.length; i++) {
-      var fds = Filter[this.defTree[id].filter[i].name](this.defTree[id].data , this.defTree[id].keyMap, this.defTree[id].filter[i].param);
+      //Limitiation:
+      // filter is not working with keyMap
+      //TO DO: modify filter function
+      ds = Filter[this.defTree[id].filter[i].name](this.defTree[id].data , this.defTree[id].keyMap, this.defTree[id].filter[i].param);
+
+      this.defTree[id].data = ds.d;
+      this.defTree[id].keyMap = ds.m;
     }
   }
 
@@ -97,7 +131,6 @@ Def.prototype.resolveDef = function (id) {
     }
   }
 
-
   //mapping objects
   for (var i = 0; i < this.defTree[id].data.length; i++) {
     var objDataTraget = {};
@@ -107,24 +140,20 @@ Def.prototype.resolveDef = function (id) {
     for (var j = 0; j < propArray.length; j++) {
 
         // 1. direct mapping
-        if (propArray[j].value.source && !propArray[j].value.helper){
-            objDataTraget[propArray[j].key] =  objDataSource[propArray[j].value.source];
-            // console.log(propArray[j].value.source);
+        if (propArray[j].value.source){
+
+            objDataTraget[propArray[j].key] =  objDataSource[propArray[j].value.source]? objDataSource[propArray[j].value.source] : "Invalid Mapping!";
           }
         //2. constant value
         else if(propArray[j].value.value){
+
           objDataTraget[propArray[j].key] = propArray[j].value.value;
           // console.log(propArray[j].value.value);
         }
 
-        //3. helper function (with or without source)
-        else if(propArray[j].value.helper){
-          objDataTraget[propArray[j].key] = Helper[propArray[j].value.helper.name](objDataSource[propArray[j].value.source], propArray[j].value.helper.param);
-          // console.log(Helper[propArray[j].value.helper.name]);
-        }
-
-        //4. Advanced - use reference
+        //3. Advanced - use reference
         // limitiation: compound keys are not yet supported
+        // no graceful error handling if reference is not valid
         else if(propArray[j].value.ref){
           if (!this.defTree[propArray[j].value.ref]){
             console.error("Cannot resovle reference " + propArray[j].value.ref + " in " + id +"." + propArray[j].key);
@@ -142,7 +171,7 @@ Def.prototype.resolveDef = function (id) {
 
           //validate local key exists
           if (!objDataTraget[propArray[j].value.key]){
-            console.error(propArray[j].value.key + " is not defined in "+id + ", or it is defined after " + propArray[j].value.key +".");
+            console.error(propArray[j].value.key + " is not defined in "+id + ", or it is defined after " + propArray[j].key +".");
             process.exit();
           }
 
@@ -154,11 +183,20 @@ Def.prototype.resolveDef = function (id) {
 
         }
 
-        //5. Advanced - use JSON Query
+        //4. Advanced - use JSON Query
         else if (propArray[j].value.query){
             objDataTraget[propArray[j].key] = jq(propArray[j].value.query, {data:objDataSource}).value;
 
         }
+
+        //finally, applay helper function (with or without source)
+        if(propArray[j].value.helper){
+
+          objDataTraget[propArray[j].key] = this.applyHelper(objDataTraget[propArray[j].key], propArray[j].value.helper);
+
+          // console.log(Helper[propArray[j].value.helper.name]);
+        }
+
       }
 
       //replace the source data with the new traget data object
