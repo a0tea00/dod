@@ -27,6 +27,12 @@ f = {
       }
     }
     return {d:data2, m:keyMap2};
+  },
+  conbine:function(data, keyMap, param){
+    //TODO return a combined array of data
+  },
+  innerQuery: function (data,keyMap,param){
+    //TODO perfrom a query on the data
   }
 
 };

@@ -99,8 +99,11 @@ Def.prototype.applyHelper = function (input, helper){
 
 /*
 resovle a particular def
-limitiation: dependency will not automatic resolve if one of the def changed
-filters can only be applied to def that is explicitly beging resolved
+limitiation:
+1. dependency will not automatic resolve if one of the def changed
+2. filters can only be applied to def that is explicitly beging resolved
+3. duplicated key is not yet supported
+
 */
 
 Def.prototype.resolveDef = function (id) {
@@ -124,6 +127,10 @@ Def.prototype.resolveDef = function (id) {
   }
 
   //3. transform data
+  if(!this.defTree[id].properties){
+    console.error(id + " does not contain property definitions. Resolve failed.");
+    process.exit(); 
+  }
   //gather properties
   for (var key in this.defTree[id].properties) {
     if (this.defTree[id].properties.hasOwnProperty(key)) {
@@ -176,6 +183,9 @@ Def.prototype.resolveDef = function (id) {
           }
 
           //search the keyMap in the reference object for traget index
+
+          //TODO: return multiple indexes if keys are not unique
+
           var index = this.defTree[propArray[j].value.ref].keyMap[propArray[j].value.sourceKey].indexOf(objDataTraget[propArray[j].value.key]);
 
           //get the soruce data by the given index
