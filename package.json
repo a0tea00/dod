@@ -5,8 +5,10 @@
   "main": "Definition.js",
   "dependencies": {
     "json-query": "^2.2.0",
-    "jsonfile":"^2.4.0",
-    "uuid":"^3.0.1"
+    "jsonfile": "^2.4.0",
+    "mongo-uuid": "0.0.4",
+    "objectid": "^3.2.1",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {},
   "scripts": {

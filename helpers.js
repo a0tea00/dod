@@ -1,11 +1,15 @@
 const uuidV1 = require('uuid/v1');
 const uuidV4 = require('uuid/v4');
 
-/*transformation helpers*/
+/*transformation helpers
+TO DO:
+Introduce goble scope for helpers.
+enable operations across the entire data set.
+*/
 
 h = {
   date:function (source, param) {
-    /* return a javascript data string in Z format*/
+    /* return a javascript date "string" in Z format*/
     //array
     if(source && source.prop && source.prop.constructor === Array){
       var a = []
@@ -81,7 +85,28 @@ h = {
       return uuidV4();
     }
     return uuidV1();
-  }
+  },
+  SimObjectID : function (source, param){
+    /*
+      return a simulated ObjectID as those used in mongoDB
+      caution: this is not a genuine ObjectID generator, which uses
+      real cluster machine information to generate clustrer-wise unqie
+      id.
+    */
+    var unixtime = (new Date().getTime())/1000|0 ;
+    unixtime = unixtime.toString(16);
+    var machineID = parseInt(Math.random() * 16777215) ;
+    machineID = ("0000000" +  machineID.toString(16)).substr(-6);
+    var ProcessID  = parseInt(process.pid);
+    ProcessID = ("0000" +  ProcessID.toString(16)).substr(-4);
+    var Counter =  parseInt(Math.random() * 16777215) ;
+    Counter = ("0000000" +  Counter.toString(16)).substr(-6);
+    return  unixtime + machineID + ProcessID + Counter;
+},
+replace:function (source,param){
+
+  
+}
 
 };
 

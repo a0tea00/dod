@@ -2,9 +2,9 @@
 /*
 data filters
 TO DO:
-ALl filters should handle keyMap when indexing is enabled.
+Introduce goble scope for filters.
+enable operations across the entire data set
 
-//follow this pair convension for dat and keyMap: {d:data, m:keyMap}
 */
 f = {
   //this filter is not currrently working with keyMap

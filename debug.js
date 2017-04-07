@@ -130,7 +130,8 @@ var def_view6 = {
     properties:{
       __v: {value:0},
       __t: {value:"KContribution"},
-      _id: {source:"guid"},
+      kf5_id: {source:"guid"},
+      _id:{helper:{name:"SimObjectID"}},
       group: {value:null},
       authors: {query:"[authors][guid]"},
       permission: {source: "published" , helper:{name:"yesOrNo",param:{"true":"public","false":"protected"}}},
@@ -162,7 +163,8 @@ var def_contribution6 = {
   properties:{
        __v: {value:1},
        __t: {value:"KContribution"},
-       _id: {source:"guid"},
+       kf5_id: {source:"guid"},
+       _id:{helper:{name:"SimObjectID"}},
        group: {value:null},
        authors: {query:"[authors][guid]"},
        permission: {value:null},
@@ -171,7 +173,7 @@ var def_contribution6 = {
        type: {source: "postType", helper:{name:"alternativeValue", param:{"NOTE":"Note", "DRAWING":"Drawing"}}},
        title: {source:"title"},
        keywords: {value:[]},
-       data: { ref:"/contribution6/body", key:"_id", sourceKey:"guid"},
+       data: { ref:"/contribution6/body", key:"kf5_id", sourceKey:"guid"},
        modified: {source: "modified",helper:{name:"date"}},
        text4search: {value:""},
        status: {value:"active"}
@@ -188,7 +190,8 @@ var def_author6 = {
       userName: {source:"userName"},
       lastName: {source:"lastName"},
       userId: {value:""},
-      _id: {source:"guid"},
+      kf5_id: {source:"guid"},
+      _id:{helper:{name:"SimObjectID"}},
       firstName: {source:"firstName"},
       email: {source:"email"},
       created: {value:""},
@@ -209,7 +212,7 @@ var def_buildOns6_view = {//_to _from includes are not required
     created: {source:"created", helper:{name:"date"}},
     type: {value:"buildson"},
     modified: {value:null},
-    _id: {helper:{name:"genUUID"}},
+    _id: {helper:{name:"SimObjectID"}},
     from: {source:"buildsOn"}
   }
 };
@@ -224,7 +227,8 @@ var def_buildOns6 ={ //_to _from includes are not required
     created: {value:null},
     type: {source:"type"},
     modified: {value:null},
-    _id: {helper:{name:"genUUID"}},
+    kf5_id: {source:"guid"},
+    _id:{helper:{name:"SimObjectID"}},
     from: {source:"from"}
   }
 
@@ -240,19 +244,26 @@ var def_contains6 ={ //_to _from includes are not required
     created: {query: "[postInfo][created]", helper:{name:"date"}},
     type: {value:"contains"},
     modified: {value:null},
-    _id: {helper:{name:"genUUID"}},
+    kf5_id: {source:"guid"},
+    _id:{helper:{name:"SimObjectID"}},
     from: {source:"viewGuid"}
   }
 
 };
 
-var def_links6={
+var def_author_id_map={
+  id:"/author6_ids",
+  source:"/author6",
+  properties:{
+    kf5_id:{source:"kf5_id"},
+    kf6_id:{source:"_id"}
+  }
 
 
 };
 
 
-var inDef = new Def([def_buildOn5, def_viewpost5, def_postref5, def_view5,def_post5,def_buildons5_view,def_author5, def_author6, def_view6, def_body6, def_contribution6, def_buildOns6, def_buildOns6_view , def_contains6]);
+var inDef = new Def([def_buildOn5, def_viewpost5, def_postref5, def_view5,def_post5,def_buildons5_view,def_author5, def_author6, def_view6, def_body6, def_contribution6, def_buildOns6, def_buildOns6_view , def_contains6, def_author_id_map]);
 
 
 /*
@@ -267,6 +278,7 @@ inDef.resolveDef("/author6");
 inDef.resolveDef("/buildons6");
 inDef.resolveDef("/view6/buildons6");
 inDef.resolveDef("/view6/contains6");
+inDef.resolveDef("/author6_ids");
 
 // console.log(inDef.defTree["/author6"].data);
 //console.log(inDef.defTree["/view6"].data);
@@ -274,9 +286,10 @@ inDef.resolveDef("/view6/contains6");
 // console.log(inDef.defTree["/buildons6"].data);
 // console.log(inDef.defTree["/view6/contains6"].data);
 
-// jf.writeFileSync("authors6.json", inDef.defTree["/author6"].data );
-// jf.writeFileSync("view6.json", inDef.defTree["/view6"].data );
-// jf.writeFileSync("contribution6.json", inDef.defTree["/contribution6"].data );
-// jf.writeFileSync("buildons6.json", inDef.defTree["/buildons6"].data );
-// jf.writeFileSync("buildons6_view.json", inDef.defTree["/view6/buildons6"].data );
-// jf.writeFileSync("contains6.json", inDef.defTree["/view6/contains6"].data );
+jf.writeFileSync("authors6.json", inDef.defTree["/author6"].data );
+jf.writeFileSync("view6.json", inDef.defTree["/view6"].data );
+jf.writeFileSync("contribution6.json", inDef.defTree["/contribution6"].data );
+jf.writeFileSync("buildons6.json", inDef.defTree["/buildons6"].data );
+jf.writeFileSync("buildons6_view.json", inDef.defTree["/view6/buildons6"].data );
+jf.writeFileSync("contains6.json", inDef.defTree["/view6/contains6"].data );
+jf.writeFileSync("author6_ids.json", inDef.defTree["/author6_ids"].data );
