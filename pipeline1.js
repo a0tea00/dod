@@ -3,6 +3,9 @@ var fs =require('fs');
 var Def = require('./Definition.js')
 var jq = require('json-query');
 
+////////////////////////////////////////////////
+//pepeline 1  -> sturuct coversion kf5 -> kf6
+
 //kf5 definitions
 // data def does not have to be having properties defined
 //however, following the json schema convension enable schema validation (future work).
@@ -18,102 +21,30 @@ var def_viewpost5 ={
   data:"kf5viewpost.json",
 };
 
-// var def_view5 = {
-//   id:"/view5",
-//   type:"object",
-//   source:"/",
-//   query:null,
-//   properties:{
-//     buildOns:{
-//       type:"array",
-//       items:{
-//         ref:"/view5/buildons5"
-//       }
-//     },
-//     locked:{type:"string"},
-//     guid:{type:"string"},
-//     title:{type:"string"},
-//     created:{type:"string"},
-//     modified:{type:"string"},
-//     sectionGuid:{type:"string"},
-//     viewPostRefs:{
-//       type:"array",
-//       items:{
-//         ref:"/view5/viewpostrefs5"
-//       }
-//     },
-//     linkedViewReferences:{type:"string"},
-//     authors:{type:"string"},
-//     active:{type:"string"},
-//     settingInfo:{type:"string"},
-//     primaryAuthorId:{type:"string"},
-//     published:{type:"string"}
-//   }
-// };
 var def_postref5 = {
   id:"/view5/viewpostrefs5",
   type:"object",
   source:"/view5",
-  query:"[viewPostRefs]",
-  properties:{
-    viewGuid:{type:"string"},
-    postInfo:{
-      type:"object",
-      properties:{
-        body:{type:"string"},
-        guid:{type:"string"},
-        title:{type:"string"},
-        created:{type:"string"},
-        modified:{type:"string"},
-        authors:{
-          type:"array",
-          items:{ref:"/view5/viewpostrefs5/authors"}
-        },
-        modified:{type:"string"}
-      }
-    }
-  }
+  query:"[viewPostRefs]"
 };
 var def_post5 = {
   id:"/view5/viewpostrefs5/postInfo5",
   type:"object",
   source:"/view5",
-  query:"[viewPostRefs][postInfo]",
-  properties:{
-        body:{type:"string"},
-        guid:{type:"string"},
-        title:{type:"string"},
-        created:{type:"string"},
-        modified:{type:"string"},
-        authors:{
-          type:"array",
-          items:{ref:"/view5/viewpostrefs5/authors"}
-        },
-        modified:{type:"string"}
-      }
+  query:"[viewPostRefs][postInfo]"
   };
 var def_buildons5_view= {
   id:"/view5/buildons5",
   type:"object",
   source:"/view5",
-  query:"[buildOns]",
-  properties:{
-
-      }
+  query:"[buildOns]"
 };
 var def_author5 = {
   id:"/view5/viewpostrefs5/postInfo5/authors5",
   type:"object",
   source:"/view5/viewpostrefs5/postInfo5",
   query:"[authors]",
-  keys:["guid"],
-  properties:{
-    userName:{type:"string"},
-    lastName:{type:"string"},
-    guid:{type:"string"},
-    email:{type:"string"},
-    firstName:{type:"string"}
-  }
+  keys:["guid"]
 };
 
 //kf 6 definitions
@@ -127,7 +58,6 @@ var def_view6 = {
       __v: {value:0},
       __t: {value:"KContribution"},
       kf5_id: {source:"guid"},
-      _id:{helper:{name:"SimObjectID"}},
       group: {value:null},
       authors: {query:"[authors][guid]"},
       permission: {source: "published" , helper:{name:"yesOrNo",param:{"true":"public","false":"protected"}}},
@@ -160,7 +90,6 @@ var def_contribution6 = {
        __v: {value:1},
        __t: {value:"KContribution"},
        kf5_id: {source:"guid"},
-       _id:{helper:{name:"SimObjectID"}},
        group: {value:null},
        authors: {query:"[authors][guid]"},
        permission: {value:null},
@@ -187,7 +116,6 @@ var def_author6 = {
       lastName: {source:"lastName"},
       userId: {value:""},
       kf5_id: {source:"guid"},
-      _id:{helper:{name:"SimObjectID"}},
       firstName: {source:"firstName"},
       email: {source:"email"},
       created: {value:""},
@@ -208,8 +136,8 @@ var def_buildOns6_view = {//_to _from includes are not required
     created: {source:"created", helper:{name:"date"}},
     type: {value:"buildson"},
     modified: {value:null},
-    _id: {helper:{name:"SimObjectID"}},
-    from: {source:"buildsOn"}
+    kf5_id: {source:"guid"},
+    from: {source:"buildsOn"},
   }
 };
 
@@ -223,8 +151,7 @@ var def_buildOns6 ={ //_to _from includes are not required
     created: {value:null},
     type: {source:"type"},
     modified: {value:null},
-    kf5_id: {source:"guid"},
-    _id:{helper:{name:"SimObjectID"}},
+    kf5_id: {helper:{name:"genUUID"}},
     from: {source:"from"}
   }
 
@@ -240,27 +167,14 @@ var def_contains6 ={ //_to _from includes are not required
     created: {query: "[postInfo][created]", helper:{name:"date"}},
     type: {value:"contains"},
     modified: {value:null},
-    kf5_id: {source:"guid"},
-    _id:{helper:{name:"SimObjectID"}},
+    kf5_id: {helper:{name:"genUUID"}},
     from: {source:"viewGuid"}
   }
 
 };
 
-var def_author_id_map={
-  id:"/author6_ids",
-  source:"/author6",
-  properties:{
-    kf5_id:{source:"kf5_id"},
-    kf6_id:{source:"_id"}
-  }
 
-
-};
-
-
-var inDef = new Def([def_buildOn5, def_viewpost5, def_postref5,def_post5,def_buildons5_view,def_author5, def_author6, def_view6, def_body6, def_contribution6, def_buildOns6, def_buildOns6_view , def_contains6, def_author_id_map]);
-
+var p1 = new Def([def_buildOn5, def_viewpost5, def_postref5,def_post5,def_buildons5_view,def_author5, def_author6, def_view6, def_body6, def_contribution6, def_buildOns6, def_buildOns6_view , def_contains6]);
 
 /*
 process flow:
@@ -268,22 +182,24 @@ resolve the Definition with the given order.
 (external processing is possible)
 */
 
-inDef.resolveDef("/view6");
-inDef.resolveDef("/contribution6");
-inDef.resolveDef("/author6");
-inDef.resolveDef("/buildons6");
-inDef.resolveDef("/view6/buildons6");
-inDef.resolveDef("/view6/contains6");
+p1.resolveDef("/view6");
+p1.resolveDef("/contribution6");
+p1.resolveDef("/author6");
+p1.resolveDef("/buildons6");
+p1.resolveDef("/view6/buildons6");
+p1.resolveDef("/view6/contains6");
 
-// console.log(inDef.defTree["/author6"].data);
-//console.log(inDef.defTree["/view6"].data);
-// console.log(inDef.defTree["/contribution6"].data);
-// console.log(inDef.defTree["/buildons6"].data);
-// console.log(inDef.defTree["/view6/contains6"].data);
+// console.log(p1.defTree["/author6"].data);
+//console.log(p1.defTree["/view6"].data);
+// console.log(p1.defTree["/contribution6"].data);
+// console.log(p1.defTree["/buildons6"].data);
+// console.log(p1.defTree["/view6/contains6"].data);
 
-jf.writeFileSync("authors6.json", inDef.defTree["/author6"].data );
-jf.writeFileSync("view6.json", inDef.defTree["/view6"].data );
-jf.writeFileSync("contribution6.json", inDef.defTree["/contribution6"].data );
-jf.writeFileSync("buildons6.json", inDef.defTree["/buildons6"].data );
-jf.writeFileSync("buildons6_view.json", inDef.defTree["/view6/buildons6"].data );
-jf.writeFileSync("contains6.json", inDef.defTree["/view6/contains6"].data );
+jf.writeFileSync("authors6.json", p1.defTree["/author6"].data );
+jf.writeFileSync("view6.json", p1.defTree["/view6"].data );
+jf.writeFileSync("contribution6.json", p1.defTree["/contribution6"].data );
+jf.writeFileSync("buildons6.json", p1.defTree["/buildons6"].data );
+jf.writeFileSync("buildons6_view.json", p1.defTree["/view6/buildons6"].data );
+jf.writeFileSync("contains6.json", p1.defTree["/view6/contains6"].data );
+
+//end of pipeline 1

@@ -3,7 +3,7 @@ const uuidV4 = require('uuid/v4');
 
 /*transformation helpers
 TO DO:
-Introduce goble scope for helpers.
+Introduce global scope for helpers.
 enable operations across the entire data set.
 */
 
@@ -86,7 +86,7 @@ h = {
     }
     return uuidV1();
   },
-  SimObjectID : function (source, param){
+  simObjectID : function (source, param){
     /*
       return a simulated ObjectID as those used in mongoDB
       caution: this is not a genuine ObjectID generator, which uses
@@ -102,10 +102,35 @@ h = {
     var Counter =  parseInt(Math.random() * 16777215) ;
     Counter = ("0000000" +  Counter.toString(16)).substr(-6);
     return  unixtime + machineID + ProcessID + Counter;
-},
-replace:function (source,param){
 
-  
+    if (param.global) {
+
+    }
+},
+removeProp:function (){
+  /*
+  remove properties from the source objects
+  */
+},
+valueOfKey:function (source, param){
+  /*
+  return all values of a given key from the source object
+
+  Note: This filter only words woth object or object array
+  */
+
+},
+lookupRefValue:function (source,param){
+  /*
+    lookup a value from another definiton
+    Note: This creates a relationship that may not present in the original input data.
+    Since DOD is not focus on data modification rather than data representation,
+    always consider including the relationship in the input data first instead
+    of generate them on the fly. It could negatively impact the maintainability
+    of your defintions.
+  */
+
+
 }
 
 };

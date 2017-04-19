@@ -1,13 +1,11 @@
 {
   "name": "descriptive_object_definition",
-  "version": "0.2.1",
+  "version": "0.4.0",
   "description": "Data transformation from source data to defined object",
   "main": "Definition.js",
   "dependencies": {
     "json-query": "^2.2.0",
     "jsonfile": "^2.4.0",
-    "mongo-uuid": "0.0.4",
-    "objectid": "^3.2.1",
     "uuid": "^3.0.1"
   },
   "devDependencies": {},
