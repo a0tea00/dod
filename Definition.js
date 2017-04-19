@@ -192,8 +192,8 @@ Def.prototype.resolveDef = function (id) {
 
           // 1. direct mapping
           if (propArray[j].value.source){
-
-              objDataTraget[propArray[j].key] =  objDataSource[propArray[j].value.source]? objDataSource[propArray[j].value.source] : "Invalid Mapping!";
+              //allow null values
+              objDataTraget[propArray[j].key] =  objDataSource[propArray[j].value.source];
             }
           //2. constant value
           else if(propArray[j].value.value){
